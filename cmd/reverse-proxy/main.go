@@ -65,15 +65,15 @@ func main() {
 	})
 
 	for _, host := range config.Hosts {
+		urlstr := host.Host
+		url, err := url.Parse(urlstr)
+		if err != nil {
+			log.Fatal("Error parsing URLs ", err)
+		}
+		proxy := httputil.NewSingleHostReverseProxy(url)
+		proxy.Transport = tr
 		r.HandleFunc(host.Path, func(res http.ResponseWriter, req *http.Request) {
 			log.Println(req.RemoteAddr, req.Method, req.URL.String())
-			urlstr := host.Host
-			url, err := url.Parse(urlstr)
-			if err != nil {
-				log.Fatal("Error parsing URLs ", err)
-			}
-			proxy := httputil.NewSingleHostReverseProxy(url)
-			proxy.Transport = tr
 			proxy.ServeHTTP(res, req)
 		})
 	}
