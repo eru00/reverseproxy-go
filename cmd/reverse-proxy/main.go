@@ -74,6 +74,7 @@ func main() {
 		proxy.Transport = tr
 		r.HandleFunc(host.Path, func(res http.ResponseWriter, req *http.Request) {
 			log.Println(req.RemoteAddr, req.Method, req.URL.String())
+			req.URL.Path = req.URL.Path[len(host.Path):]
 			proxy.ServeHTTP(res, req)
 		})
 	}
