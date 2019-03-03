@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -24,12 +25,17 @@ type Config struct {
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
+	configPath := flag.String("config", "", "Path to the configuration file")
+	port := flag.String("port", "", "Port the server will listen to")
+	flag.Parse()
+	if *configPath == "" {
+		log.Fatal("Path to the configuration file not set.")
+	}
+	if *port == "" {
 		log.Fatal("PORT variable is not set")
 	}
 
-	configFile, err := os.Open("config.json")
+	configFile, err := os.Open(*configPath)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -73,7 +79,7 @@ func main() {
 	}
 
 	server := http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + *port,
 		Handler: r,
 	}
 
@@ -89,7 +95,7 @@ func main() {
 		}
 	}()
 
-	log.Printf("Listening at :%s", port)
+	log.Printf("Listening at :%s", *port)
 	log.Println(server.ListenAndServe())
 
 }
